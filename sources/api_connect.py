@@ -3,15 +3,24 @@
 Created on 23/05/2023 14:30
 @author: GiovanniMINGHELLI
 """
-
+import base64
 import time
 import requests
+import os
+
+project_path = os.getcwd()
+while os.path.basename(project_path) != "SmashTheOdds":
+    project_path = os.path.dirname(project_path)
+    os.chdir(project_path)
+
+with open("token.txt", "r") as file:
+    token = base64.b64decode(file.read()).decode()
 
 
 class API(object):
     session = requests.Session()
 
-    def __init__(self, api_key: str, format_: str = 'json', access_level: str = 'trial',
+    def __init__(self, api_key: str = token, format_: str = 'json', access_level: str = 'trial',
                  version: str = 'v2', language_code: str = 'fr', timeout: int = 5, sleep_time: float = 1.5):
         """ Sportradar API Constructor
 
@@ -39,5 +48,3 @@ class API(object):
         response = self.session.request(method, full_uri, timeout=self.timeout, params={'api_key': self.api_key})
         print(response.status_code)
         return response
-
-

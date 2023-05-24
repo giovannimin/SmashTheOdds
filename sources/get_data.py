@@ -3,16 +3,12 @@
 Created on 23/05/2023 18:31
 @author: GiovanniMINGHELLI
 """
-import base64
 
-from sources.api_connect import API
-
-with open("token.txt", "r") as file:
-    token = base64.b64decode(file.read()).decode()
+from sources.api_connect import API, token
 
 
 class Tennis(API):
-    def __init__(self, api_key: str, format_: str = 'json', access_level: str = 'trial',
+    def __init__(self, api_key: str = token, format_: str = 'json', access_level: str = 'trial',
                  version: str = 'v2', language_code: str = 'fr', timeout: int = 5, sleep_time: float = 1.5):
         super().__init__(api_key, format_, access_level, version, language_code, timeout, sleep_time)
 
