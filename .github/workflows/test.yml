@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout latest code version from git
         uses: actions/checkout@v2
+        with: 
+          path: ./
 
       - name: Set up Python environement
         uses: actions/setup-python@v2
