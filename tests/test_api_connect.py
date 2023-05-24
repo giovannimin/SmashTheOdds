@@ -5,7 +5,7 @@ Created on 24/05/2023 15:04
 """
 import base64
 import pytest
-from ..sources.get_data import Tennis
+from sources.get_data import Tennis
 
 
 class TestTennisAPI:
