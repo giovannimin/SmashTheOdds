@@ -9,4 +9,11 @@
     <option name="removeUnused" value="true" />
     <option name="modifyBaseFiles" value="true" />
   </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/tests" />
+      </list>
+    </option>
+  </component>
 </module>
