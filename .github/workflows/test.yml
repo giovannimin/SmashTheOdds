@@ -1,4 +1,4 @@
-name: Run test
+name: Run tests
 
 on:
   push:
@@ -9,17 +9,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout latest code version from git
-        uses: actions/checkout@latest
+  steps:
+    - name: Checkout latest code version from git
+      uses: actions/checkout@v2
 
-      - name: Set up Python environement
-        uses: actions/setup-python@latest
-        with:
-          python-version: 3.9
+    - name: Set up Python environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
 
-      - name: Install dependencies from requirements.txt
-        run: pip install -r requirements.txt
+    - name: Install dependencies from requirements.txt
+      run: pip install -r requirements.txt
 
-      - name: Run all tests
-        run: pytest tests/
+    - name: Run all tests
+      run: pytest tests/
