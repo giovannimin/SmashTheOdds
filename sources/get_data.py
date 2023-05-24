@@ -92,7 +92,3 @@ class Tennis(API):
         """
         return self._make_request(path=f'/players/sr:competitor:{player_id}/schedule')
 
-
-test = Tennis(token).get_ranking()
-
-# %%
