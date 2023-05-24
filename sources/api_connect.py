@@ -30,14 +30,14 @@ class API(object):
         self.timeout = timeout
         self._sleep_time = sleep_time
 
-    def _make_request(self, path, method='GET'):
+    def _make_request(self, path, method='GET', version=None):
         time.sleep(self._sleep_time)
-        full_uri = self.api_root + self.access_level + '/' + self.version + '/' + self.language + path + self.format_
-        display(full_uri)
-        response = self.session.request(method, full_uri,
-                                        timeout=self.timeout, params={'api_key': self.api_key})
-        if response.status_code == 200:
-            return response
-        else:
-            raise Exception(f"Request failed with status code {response.status_code}")
+        if not version:
+            version = self.version
+        full_uri = self.api_root + self.access_level + '/' + version + '/' + self.language + path + self.format_
+        print(full_uri)
+        response = self.session.request(method, full_uri, timeout=self.timeout, params={'api_key': self.api_key})
+        print(response.status_code)
+        return response
+
 

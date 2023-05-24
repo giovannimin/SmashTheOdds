@@ -30,11 +30,11 @@ class Tennis(API):
 
     def get_match_proba(self, match_id: int):
         """Provides 2-way probabilities (home team win, away team win) for a given match."""
-        return self._make_request(path=f'/matches/{match_id}/probabilities')
+        return self._make_request(path=f'/matches/sr:match:{match_id}/probabilities')
 
     def get_match_summary(self, match_id: int):
         """Returns information for a match including live updates and statistics"""
-        return self._make_request(path=f'/matches/{match_id}/summary')
+        return self._make_request(path=f'/matches/sr:match:{match_id}/summary')
 
     def get_match_timeline(self, match_id: int):
         """
@@ -43,7 +43,7 @@ class Tennis(API):
         :param match_id:
         :return:
         """
-        return self._make_request(path=f'/matches/{match_id}/timeline')
+        return self._make_request(path=f'/matches/sr:match:{match_id}/timeline')
 
     def get_head_to_head(self, player1_id: int, player2_id: int):
         """
@@ -52,7 +52,7 @@ class Tennis(API):
         :param player2_id:
         :return:
         """
-        return self._make_request(path=f'/players/{player1_id}/versus/{player2_id}/matches')
+        return self._make_request(path=f'/players/sr:competitor:{player1_id}/versus/sr:competitor:{player2_id}/matches')
 
     def get_player_profile(self, player_id: int):
         """
@@ -60,7 +60,7 @@ class Tennis(API):
         :param player_id:
         :return:
         """
-        return self._make_request(path=f'/players/{player_id}/profile')
+        return self._make_request(path=f'/players/sr:competitor:{player_id}/profile')
 
     def get_race_ranking(self):
         """
@@ -82,7 +82,7 @@ class Tennis(API):
         :param player_id:
         :return:
         """
-        return self._make_request(path=f'/players/{player_id}/results')
+        return self._make_request(path=f'/players/sr:competitor:{player_id}/results')
 
     def get_player_schedule(self, player_id: int):
         """
@@ -90,7 +90,7 @@ class Tennis(API):
         :param player_id:
         :return:
         """
-        return self._make_request(path=f'/players/{player_id}/schedule')
+        return self._make_request(path=f'/players/sr:competitor:{player_id}/schedule')
 
 
 test = Tennis(token).get_ranking()
