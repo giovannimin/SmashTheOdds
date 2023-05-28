@@ -9,10 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout latest code version from git
         uses: actions/checkout@v2
+        with:
+          path: ./
 
-      - name: Set up Python
+      - name: Set up Python environement
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
