@@ -5,9 +5,12 @@ Created on 25/05/2023 20:32
 """
 
 from sources.preprocessor import make_table
-from sources.api_connect import project_path
+from sources.utils import get_root
 import os
 
 if __name__ == '__main__':
-    table = make_table(n=200)
-    table.to_csv(os.path.join(project_path, 'database.nosync', 'updated_table.csv'))
+    project_path = get_root()
+    table = make_table(n=500)
+    table.to_csv(os.path.join(project_path, 'database.nosync', 'updated_table.csv'),  mode='a', header=False,
+                 index=False)
+
