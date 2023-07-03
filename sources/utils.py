@@ -5,7 +5,15 @@ Created on 25/05/2023 17:09
 """
 
 import re
+import os
 
+
+def get_root(root: str = "SmashTheOdds"):
+    proj_path = os.getcwd()
+    while os.path.basename(proj_path) != root:
+        proj_path = os.path.dirname(proj_path)
+        os.chdir(proj_path)
+    return proj_path
 
 
 def get_number_in_id(sr_id: str) -> str:
