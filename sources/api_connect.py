@@ -6,12 +6,10 @@ Created on 23/05/2023 14:30
 import base64
 import time
 import requests
-import os
+from sources.utils import get_root
 
-project_path = os.getcwd()
-while os.path.basename(project_path) != "SmashTheOdds":
-    project_path = os.path.dirname(project_path)
-    os.chdir(project_path)
+
+_ = get_root()
 
 with open("token.txt", "r") as file:
     token = base64.b64decode(file.read()).decode()
