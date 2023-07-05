@@ -10,7 +10,7 @@ import os
 
 if __name__ == '__main__':
     project_path = get_root()
-    table = make_table(n=500)
+    table = make_table(n=200)
     table.to_csv(os.path.join(project_path, 'database.nosync', 'updated_table.csv'),  mode='a', header=False,
                  index=False)
 
