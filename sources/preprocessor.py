@@ -22,18 +22,16 @@ def prep_daily_results(year=today.year, month=today.month, day=today.day):
 def get_weekly_schedule():
     df_list = []
     for date in get_next_seven_days():
-        year, month, day = date.split('-')
-        reponse = Tennis().get_daily_schedule(year=int(year), month=int(month), day=int(day))
-        a = pd.DataFrame(reponse.json()['sport_events'])
-        a = a[(a['status'] == 'not_started') & (a['sport_event_type'] == 'singles')]
-        b = pd.concat([a, a['competitors'].apply(pd.Series)], axis=1).drop('competitors', axis=1)
-        b = b.rename(columns={'id': 'match_id'})
-        c = pd.concat([b, b.iloc[:, -1].apply(pd.Series)], axis=1)
-        c = c.rename(columns={'id': 'player1_id'})
-        d = pd.concat([c, b.iloc[:, -2].apply(pd.Series)], axis=1)
-        d = d.rename(columns={'id': 'player2_id'})
-        df_list.append(d.reset_index(drop=True))
-    return pd.concat(df_list, axis=0)
+        year, month, day = map(int, date.split('-'))
+        response = Tennis().get_daily_schedule(year=year, month=month, day=day)
+        df_response = pd.json_normalize(response.json()['sport_events'])
+        df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
+        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')
+        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_')
+
+        df = pd.concat([df_response, player1_df, player2_df], axis=1)
+        df_list.append(df)
+    return pd.concat(df_list, axis=0, ignore_index=True)
 
 
 def get_match_proba(match_id: int) -> tuple:
@@ -107,3 +105,5 @@ def make_table(n: int = 50):
     """
     return pd.concat([prep_player(player_id=player_id) for player_id in tqdm(get_top(n=n), desc='Processing players')],
                      axis=0)
+
+#%%
