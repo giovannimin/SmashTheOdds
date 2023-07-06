@@ -1,8 +1,6 @@
-name: Weekly players data update
+name: Week
 
-on:
-  schedule:
-    - cron: "* * * * *"
+on: [workflow_dispatch]
 
 jobs:
   update-table:
@@ -11,6 +9,8 @@ jobs:
     steps:
       - name: Checkout latest code version from git
         uses: actions/checkout@v2
+        with:
+          path: SmashTheOdds/
 
       - name: Set up Python environement
         uses: actions/setup-python@v2
