@@ -19,7 +19,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run table update script
-        run: python sources/update_table.py
+        run: ls
 
       - name: Commit and push data changes
         run: |
