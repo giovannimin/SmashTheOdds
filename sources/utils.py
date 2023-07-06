@@ -71,7 +71,7 @@ def get_last_model():
 
 
 def get_response(model, data):
-    results = {'classe': model.predict(data), 'proba': model.predict_proba(data).round(2)}
+    results = {'classe': model.predict(data).tolist(), 'proba': model.predict_proba(data).round(2).tolist()}
     results['odds'] = calculate_odds(results['proba']).round(2)
     return results
 

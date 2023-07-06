@@ -7,9 +7,8 @@ import os
 
 import pandas as pd
 import numpy as np
-from sources.preprocessor import get_weekly_schedule
-from sources.preprocessor import prep_ranking
-from sources.utils import get_root, check_file_modification
+from preprocessor import get_weekly_schedule, prep_ranking
+from utils import get_root, check_file_modification
 
 
 def history(df: pd.DataFrame() = pd.read_csv(os.path.join(get_root(), 'database.nosync', 'updated_table.csv'))):
@@ -73,8 +72,13 @@ def next_events(df: str = os.path.join(get_root(), 'database.nosync', 'planning_
 
 
 def global_transformer(df: pd.DataFrame):
+    # Instantion d'une table ranking
+    data = prep_ranking()
+    # Modification des ID joueurs par le classement ATP associé
+    df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(
+        dict(zip(data['id'], data['rank']))) ##Loc a chnager
     # Création de la variable rank_diff
-    df['atp_difference'] = df['player2_id'] - df['player1_id']
+    df.loc[:, 'atp_difference'] = df['player2_id'] - df['player1_id']
     # Suppression des affrontement n'ayant pas au moins un des deux joueur classé ATP
     df = df[(df['player1_id'] != 1000) & (df['player2_id'] != 1000)]
     return df
