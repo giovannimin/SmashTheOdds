@@ -2,7 +2,7 @@ name: Weekly players data update
 
 on:
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: "* * * * *"
 
 jobs:
   update-table:
@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout latest code version from git
         uses: actions/checkout@v2
-        with:
-          path: ./
 
       - name: Set up Python environement
         uses: actions/setup-python@v2
