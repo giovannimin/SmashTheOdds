@@ -30,7 +30,7 @@ def get_number_in_id(sr_id: str) -> str:
     :return: (str) Identifiant sans préfixe.
     """
     numbers = re.findall(r'\d+', sr_id)
-    return numbers[0] if numbers else ""
+    return int(numbers[0]) if numbers else ""
 
 
 def check_file_modification(file_path, since: int = 3):
@@ -57,3 +57,26 @@ def calculate_odds(probability):
     """
     odds = 1 / probability
     return odds
+
+
+def get_last_model():
+    """
+    Renvoi le chemin du dernier modèle modifié à la racine du projet
+    :return: (str): chemin absolu du dernier modèle
+    """
+    last_model = sorted([file for file in os.listdir(get_root()) if file.startswith('model_')],
+                        key=lambda x: os.path.getmtime(os.path.join(get_root(), x)), reverse=True)[0]
+    return os.path.join(get_root(), last_model)
+
+
+
+def get_response(model, data):
+    results = {'classe': model.predict(data), 'proba': model.predict_proba(data).round(2)}
+    results['odds'] = calculate_odds(results['proba']).round(2)
+    return results
+
+
+
+#Fonction de gestion des id pré :
+#Fonction de gestion des features :
+#Fonctions des test ATP, Masculin, etc..
