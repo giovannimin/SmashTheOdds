@@ -5,14 +5,14 @@ Created on 05/07/2023 16:43
 """
 import os
 from sources.data_pipeline import global_transformer, next_events, history
-from sources.utils import calculate_odds
+from sources.utils import calculate_odds, get_last_model, get_root
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
 import joblib
 from datetime import datetime
 from sklearn.model_selection import GridSearchCV
-from sources.utils import get_root
+
 
 
 def modelling():
@@ -41,8 +41,12 @@ def modelling():
     results['classe'], results['proba'] = best_model.predict(results), best_model.predict_proba(results)[:, 1].round(2)
     results['odds'] = calculate_odds(results['proba']).round(2)
 
-    # Étape 5 : Enregistrement des résultats et du modèle
+    # Étape 5 : Suppresion de l'ancien modèle
+    os.remove(get_last_model())
+
+    # Étape 6 : Enregistrement des résultats et du modèle
     results.to_csv(os.path.join(get_root(), 'predicted_table.csv'), mode='a', header=True, index=False)
+    # Ajouter la colonne des sr:match_id
     joblib.dump(value=best_model, filename=f'model_rf_{datetime.now().strftime("%Y-%m-%d")}.joblib')
 
 
