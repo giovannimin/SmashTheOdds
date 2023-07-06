@@ -4,8 +4,8 @@ Created on 25/05/2023 20:32
 @author: GiovanniMINGHELLI
 """
 
-from sources.preprocessor import make_table
-from sources.utils import get_root
+from preprocessor import make_table
+from utils import get_root
 import os
 
 if __name__ == '__main__':
