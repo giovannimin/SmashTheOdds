@@ -3,13 +3,14 @@
 Created on 24/05/2023 22:07
 @author: GiovanniMINGHELLI
 """
+import os
 from typing import List
 
 import pandas as pd
 from tqdm import tqdm
 from datetime import date
 from sources.get_data import Tennis
-from sources.utils import get_number_in_id
+from sources.utils import get_number_in_id, check_file_modification, get_root
 from sources.week_calendar import get_next_seven_days
 
 today = date.today()
@@ -32,6 +33,18 @@ def get_weekly_schedule():
         df = pd.concat([df_response, player1_df, player2_df], axis=1)
         df_list.append(df)
     return pd.concat(df_list, axis=0, ignore_index=True)
+
+
+def get_match_info(match_id: int):
+    match = Tennis().get_match_summary(match_id=match_id)
+    df_response = pd.json_normalize(match.json()['sport_event'])
+    df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
+    player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')
+    player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_')
+    df = pd.concat([df_response, player1_df, player2_df], axis=1)
+    data = prep_ranking()
+    df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(dict(zip(data['id'], data['rank'])))
+    return df
 
 
 def get_match_proba(match_id: int) -> tuple:
@@ -62,15 +75,21 @@ def prep_competition() -> pd.DataFrame:
 
 
 def prep_ranking() -> pd.DataFrame:
-    # Obtenir les données de classement
-    ranking_data = pd.DataFrame(Tennis().get_ranking().json()['rankings'])
-    # Filtrer les données pour la compétition 'ATP'
-    data = pd.DataFrame(ranking_data.loc[ranking_data['name'] == 'ATP', 'player_rankings'].iloc[0])
-    # Étendre le DataFrame avec les informations du joueur
-    data = pd.concat([data, data['player'].apply(pd.Series)], axis=1)
-    # Supprimer les colonnes indésirables
-    data.drop(['player', 'name', 'nationality', 'country_code', 'abbreviation'], axis=1, inplace=True)
-    return data
+    # Verification de si le classement a moins de 72h
+    if check_file_modification(os.path.join(get_root(), 'database.nosync', 'atp_ranking.csv'), since=3):
+        return pd.read_csv(os.path.join(get_root(), 'database.nosync', 'atp_ranking.csv'))
+    else:
+        # Obtenir les données de classement
+        ranking_data = pd.DataFrame(Tennis().get_ranking().json()['rankings'])
+        # Filtrer les données pour la compétition 'ATP'
+        data = pd.DataFrame(ranking_data.loc[ranking_data['name'] == 'ATP', 'player_rankings'].iloc[0])
+        # Étendre le DataFrame avec les informations du joueur
+        data = pd.concat([data, data['player'].apply(pd.Series)], axis=1)
+        # Supprimer les colonnes indésirables
+        data.drop(['player', 'name', 'nationality', 'country_code', 'abbreviation'], axis=1, inplace=True)
+        # Actualisation du classement
+        data.to_csv(os.path.join(get_root(), 'database.nosync', 'atp_ranking.csv'), index=False)
+        return data
 
 
 def prep_player(player_id: int) -> pd.DataFrame:
@@ -106,4 +125,4 @@ def make_table(n: int = 50):
     return pd.concat([prep_player(player_id=player_id) for player_id in tqdm(get_top(n=n), desc='Processing players')],
                      axis=0)
 
-#%%
+# %%
