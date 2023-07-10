@@ -28,8 +28,9 @@ def get_pred(match_id: int):
     return get_response(model=model, data=data)
 
 
+
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
