@@ -9,9 +9,9 @@ from typing import List
 import pandas as pd
 from tqdm import tqdm
 from datetime import date
-from get_data import Tennis
-from utils import get_number_in_id, check_file_modification, get_root
-from week_calendar import get_next_seven_days
+from .get_data import Tennis
+from .utils import get_number_in_id, check_file_modification, get_root
+from .week_calendar import get_next_seven_days
 
 today = date.today()
 

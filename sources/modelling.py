@@ -4,8 +4,8 @@ Created on 05/07/2023 16:43
 @author: GiovanniMINGHELLI
 """
 import os
-from data_pipeline import global_transformer, next_events, history
-from utils import calculate_odds, get_last_model, get_root
+from .data_pipeline import global_transformer, next_events, history
+from .utils import calculate_odds, get_last_model, get_root
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier

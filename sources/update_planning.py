@@ -4,8 +4,8 @@ Created on 25/05/2023 20:32
 @author: GiovanniMINGHELLI
 """
 
-from preprocessor import get_weekly_schedule
-from utils import get_root
+from .preprocessor import get_weekly_schedule
+from .utils import get_root
 import os
 
 if __name__ == '__main__':
