@@ -87,4 +87,3 @@ class Tennis(API):
         :return:
         """
         return self._make_request(path=f'/players/sr:competitor:{player_id}/schedule')
-

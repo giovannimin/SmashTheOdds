@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import numpy as np
 from .preprocessor import get_weekly_schedule, prep_ranking
-from .utils import get_root, check_file_modification
+from .utils import get_root, check_file_modification, replace_player_ids_with_rank, filter_dataframe
 
 
 def history(df: pd.DataFrame() = pd.read_csv(os.path.join(get_root(), 'database.nosync', 'updated_table.csv'))):
@@ -17,14 +17,9 @@ def history(df: pd.DataFrame() = pd.read_csv(os.path.join(get_root(), 'database.
     :param df: (pd.DataFrame) DataFrame contenant les données des matchs.
     :return: (pd.DataFrame) DataFrame traité contenant les colonnes 'winner_is', 'player1_id' et 'player2_id'.
     """
-    # Instantion d'une table ranking
-    data = prep_ranking()
     # Modification des ID joueurs par le classement ATP associé
-    df[['player1_id', 'player2_id', 'winner_id']] = df[['player1_id', 'player2_id', 'winner_id']].replace(
-        dict(zip(data['id'], data['rank'])))
-    # Remplacement des ID joueurs hors classement ATP par un 1000 pour marquer la différence
-    df['player1_id'] = df['player1_id'].replace(to_replace='^.*$', value=1000, regex=True)
-    df['player2_id'] = df['player2_id'].replace(to_replace='^.*$', value=1000, regex=True)
+    df = replace_player_ids_with_rank(dataframe=df, ranking=prep_ranking(), unranked=1000)
+
     # Création de la variable cible, 0 si le joueur 1 gagne et 1 si le joueur 2 gagne
     df['winner_is'] = np.where(df['player1_id'] == df['winner_id'], 0, 1)
 
@@ -56,31 +51,25 @@ def next_events(df: str = os.path.join(get_root(), 'database.nosync', 'planning_
         planning = pd.read_csv(df)
     else:
         planning = get_weekly_schedule()
-    # Instantion d'une table ranking
-    data = prep_ranking()
+
     # Modification des ID joueurs par le classement ATP associé
-    planning[['player1_id', 'player2_id']] = planning[['player1_id', 'player2_id']].replace(
-        dict(zip(data['id'], data['rank'])))
-    # Remplacement des ID joueurs hors classement ATP par un 1000 pour marquer la différence
-    planning['player1_id'] = planning['player1_id'].replace(to_replace='^.*$', value=1000, regex=True)
-    planning['player2_id'] = planning['player2_id'].replace(to_replace='^.*$', value=1000, regex=True)
-    
+    planning = replace_player_ids_with_rank(dataframe=planning, ranking=prep_ranking(), unranked=1000)
+
     # Sélection uniquement des match ATP n'ayant pas encore commencés
-    planning = planning[(planning['tournament.category.name'] == 'ATP') & (
-        planning['status'].isin(['match_about_to_start', 'not_started']))]
+    planning = filter_dataframe(dataframe=planning, filters={
+        'tournament.category.name': ['ATP'],
+        'status': ['match_about_to_start', 'not_started']
+    })
+
     return planning[['player1_id', 'player2_id']]
 
 
 def global_transformer(df: pd.DataFrame):
-    # Instantion d'une table ranking
-    data = prep_ranking()
     # Modification des ID joueurs par le classement ATP associé
-    df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(
-        dict(zip(data['id'], data['rank']))) ##Loc a chnager
+    df = replace_player_ids_with_rank(dataframe=df, ranking=prep_ranking(), unranked=1000)
     # Création de la variable rank_diff
     df.loc[:, 'atp_difference'] = df['player2_id'] - df['player1_id']
-    # Suppression des affrontement n'ayant pas au moins un des deux joueur classé ATP
-    df = df[(df['player1_id'] != 1000) & (df['player2_id'] != 1000)]
+    # Gestion des affrontement hors ATP
     return df
 
 
