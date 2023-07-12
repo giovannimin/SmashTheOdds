@@ -7,6 +7,8 @@ Created on 25/05/2023 17:09
 import re
 import os
 from datetime import datetime, timedelta
+import pandas as pd
+
 
 
 def get_root(root: str = "SmashTheOdds"):
@@ -48,6 +50,23 @@ def check_file_modification(file_path, since: int = 3):
     return False
 
 
+def replace_player_ids_with_rank(dataframe: pd.DataFrame, ranking=pd.DataFrame, unranked: int = 1000) -> pd.DataFrame:
+    # Création d'un dictionnaire pour mapper les ID des joueurs avec les classements ATP
+    player_rank_mapping = dict(zip(ranking['id'], ranking['rank']))
+    # Modification des ID des joueurs par les classements ATP associés
+    dataframe[['player1_id', 'player2_id']] = dataframe[['player1_id', 'player2_id']].replace(player_rank_mapping)
+    # Remplacement des ID des joueurs hors classement ATP par 1000 pour marquer la différence
+    dataframe['player1_id'] = dataframe['player1_id'].replace(to_replace='^.*$', value=unranked, regex=True)
+    dataframe['player2_id'] = dataframe['player2_id'].replace(to_replace='^.*$', value=unranked, regex=True)
+    return dataframe
+
+
+def filter_dataframe(dataframe: pd.DataFrame, filters: dict):
+    for column, values in filters.items():
+        dataframe = dataframe[dataframe[column].isin(values)]
+    return dataframe
+
+
 def calculate_odds(probability):
     """
     Calcule les cotes à partir d'une probabilité de victoire.
@@ -69,15 +88,8 @@ def get_last_model():
     return os.path.join(get_root(), last_model)
 
 
-
 def get_response(model, data):
     results = {'classe': int(model.predict(data)),
                'proba': model.predict_proba(data).round(2).flatten().tolist(),
                'odds': (calculate_odds(model.predict_proba(data))).round(2).flatten().tolist()}
     return results
-
-
-
-#Fonction de gestion des id pré :
-#Fonction de gestion des features :
-#Fonctions des test ATP, Masculin, etc..
