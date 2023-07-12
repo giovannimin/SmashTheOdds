@@ -6,21 +6,18 @@ GAME SET & BET 🎾
 
 ## Getting Started
 
-Ces instructions permettent d'executer une copie du projet en local sur votre poste de travail pour le développement et les tests. Référez-vous à la section "Déploiement" pour les étapes à suivre pour déployer le projet en production.
+These instructions allow you to run a copy of the project locally on your system for development and testing purposes. Refer to the "Deployment" section for the steps to follow to deploy the project in production.
+### Prerequisites
 
-### Pré-requis
+To run the SmashTheOdds project locally, you must :
 
-Pour executer en local le projet Open Transport, vous devez au préalable installer :
-
-```
-Aucun pré-requis
-
-```
+1. Clone the repository `git clone https://github.com/giovannimin/SmashTheOdds.git`
+2. Install python libraries needed  `pip install requirements.txt`
+3. Create token.txt file on root and paste token from [SportRadar-TennisAPI](https://developer.sportradar.com)
 
 ### Installation
 
-Voici les étapes à suivre pour avoir un environnement de développement et de test opérationnel :
-
+Here are the steps you need to follow to have an operational development and test environment:
 
 ```
 A définir
@@ -28,16 +25,16 @@ A définir
 
 
 
-## Executer les tests
+## Running tests
 
 ```
-A définir : expliquer comment executer les tests
+python3 -m pytest tests/                                                                                                                                                                                      ─╯
 ```
 
 
-## Deploiement
+## Deployment
 
-Voici les étapes à suivre pour déployer en production :
+Here are the steps to follow to deploy :
 
 ```
 A définir
@@ -45,19 +42,15 @@ A définir
 
 ## Technologies :
 
-* HTML5/CSS3
-* [Boostrap](https://getbootstrap.com/)
+* 
+* 
 
 ## Contribution
 
-Merci de lire les fichiers :
-* [CONTRIBUTING.md](https://github.com/OpenClassrooms-Student-Center/7688581-Expert-Git-GitHub/blob/main/CONTRIBUTING.md)
-* [CODE_OF_CONDUCT.md](https://github.com/OpenClassrooms-Student-Center/7688581-Expert-Git-GitHub/blob/main/CONTRIBUTING.md) 
+Please feel free to submit issues and feature requests!
 
-## Auteurs
+## Credits
 
-* **O. C.**
+* **[Duhin Lucie](https://linkedin.com)**
+* **[Minghelli Giovanni](https://linkedin.com)**
 
-## License
-
-Ce projet est sous la licence GNU GPL V3 - voir le fichier [LICENSE](LICENSE) pour plus de détails
