@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Local API Interaction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-4">Local API Interaction</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="input-group">
+                <label for="matchIdInput"></label><input type="text" id="matchIdInput" class="form-control" placeholder="Match ID">
+                <button class="btn btn-primary" onclick="getMatchInfo()">Get Match Info</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <pre id="matchInfo" style="white-space: pre-wrap;"></pre>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="get_rep.js"></script>
+</body>
+</html>
