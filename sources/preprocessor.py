@@ -25,6 +25,8 @@ def get_weekly_schedule():
     for date in get_next_seven_days():
         year, month, day = map(int, date.split('-'))
         response = Tennis().get_daily_schedule(year=year, month=month, day=day)
+        if response.status_code != 200:
+            return response.json()
         df_response = pd.json_normalize(response.json()['sport_events'])
         df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
         player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')
@@ -36,8 +38,10 @@ def get_weekly_schedule():
 
 
 def get_match_info(match_id: int):
-    match = Tennis().get_match_summary(match_id=match_id)
-    df_response = pd.json_normalize(match.json()['sport_event'])
+    response = Tennis().get_match_summary(match_id=match_id)
+    if response.status_code != 200:
+        return response.json()
+    df_response = pd.json_normalize(response.json()['sport_event'])
     df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
     player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')
     player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_')
@@ -48,9 +52,11 @@ def get_match_info(match_id: int):
 
 
 def get_match_proba(match_id: int) -> tuple:
-    match = Tennis().get_match_proba(match_id=match_id)
-    home = match.json()['probabilities']['markets'][-1]['outcomes'][0]['probability']
-    away = match.json()['probabilities']['markets'][-1]['outcomes'][1]['probability']
+    response = Tennis().get_match_proba(match_id=match_id)
+    if response.status_code != 200:
+        return response.json()
+    home = response.json()['probabilities']['markets'][-1]['outcomes'][0]['probability']
+    away = response.json()['probabilities']['markets'][-1]['outcomes'][1]['probability']
     return home, away
 
 
