@@ -27,7 +27,7 @@ app.add_middleware(
 
 @app.get("/status")
 def get_status():
-    return {"status": 1} if True else {"status": 0}
+    return {"status": 1}
 
 
 @app.get("/predict")
@@ -40,8 +40,3 @@ def get_pred(match_id: int):
     except TypeError:
         return match_info
 
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
