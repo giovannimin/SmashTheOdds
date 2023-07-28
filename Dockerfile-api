@@ -1,0 +1,12 @@
+FROM python:3.9
+
+WORKDIR /app
+
+COPY api/api_requirements.txt /app/api_requirements.txt
+
+RUN pip install --no-cache-dir -r api_requirements.txt
+
+COPY . .
+
+CMD ["python3", "-m", "uvicorn", "api.api_main:app", "--reload"]
+

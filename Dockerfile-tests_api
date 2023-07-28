@@ -1,0 +1,13 @@
+FROM python:3.9
+
+WORKDIR /app
+
+COPY tests/tests_requirements.txt /app/tests_requirements.txt
+
+RUN pip install --no-cache-dir -r tests_requirements.txt
+
+COPY . .
+
+ENV API_URL=http://api:8000 LOG_PATH=.logs/log.txt
+
+#CMD ["python3", "-m", "pytest", "tests/test_api.py"]

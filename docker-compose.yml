@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    ports:
+      - "8000:8000"
+    networks:
+      - smash_odds_network
+    volumes:
+      - ./database.nosync:/app/data
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile-tests_api
+    environment:
+      - API_URL=http://api:8000
+      - LOG_PATH=.logs/log.txt
+    depends_on:
+      - api
+    networks:
+      - smash_odds_network
+    volumes:
+      - ./logs:/app/logs
+
+networks:
+  smash_odds_network:
