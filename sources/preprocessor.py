@@ -9,9 +9,9 @@ from typing import List
 import pandas as pd
 from tqdm import tqdm
 from datetime import date
-from .get_data import Tennis
-from .utils import get_number_in_id, check_file_modification, get_root
-from .week_calendar import get_next_seven_days
+from get_data import Tennis
+from utils import get_number_in_id, check_file_modification, get_root
+from week_calendar import get_next_seven_days
 
 today = date.today()
 
@@ -29,8 +29,8 @@ def get_weekly_schedule():
             return response.json()
         df_response = pd.json_normalize(response.json()['sport_events'])
         df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
-        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')
-        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_')
+        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
+        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
 
         df = pd.concat([df_response, player1_df, player2_df], axis=1)
         df_list.append(df)
@@ -43,8 +43,8 @@ def get_match_info(match_id: int):
         return response.json()
     df_response = pd.json_normalize(response.json()['sport_event'])
     df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
-    player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')
-    player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_')
+    player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
+    player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
     df = pd.concat([df_response, player1_df, player2_df], axis=1)
     data = prep_ranking()
     df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(dict(zip(data['id'], data['rank'])))
@@ -128,7 +128,7 @@ def make_table(n: int = 50):
     Concatenates DataFrames of n ATP top players results into a single table.
     :return: Concatenated table of player results
     """
-    return pd.concat([prep_player(player_id=player_id) for player_id in tqdm(get_top(n=n), desc='Processing players')],
+    return pd.concat([prep_player(player_id=player_id) for player_id in tqdm(get_top(n=n), desc='Processing players')], # type: ignore
                      axis=0)
 
 # %%
