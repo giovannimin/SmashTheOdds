@@ -93,3 +93,4 @@ def get_response(model, data):
                'proba': model.predict_proba(data).round(2).flatten().tolist(),
                'odds': (calculate_odds(model.predict_proba(data))).round(2).flatten().tolist()}
     return results
+

@@ -9,9 +9,9 @@ from typing import List
 import pandas as pd
 from tqdm import tqdm
 from datetime import date
-from get_data import Tennis
-from utils import get_number_in_id, check_file_modification, get_root
-from week_calendar import get_next_seven_days
+from sources.get_data import Tennis
+from sources.utils import get_number_in_id, check_file_modification, get_root
+from sources.week_calendar import get_next_seven_days
 
 today = date.today()
 
@@ -28,11 +28,12 @@ def get_weekly_schedule():
         if response.status_code != 200:
             return response.json()
         df_response = pd.json_normalize(response.json()['sport_events'])
-        df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
-        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
-        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
+        #df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
+        #player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
+        #player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
 
-        df = pd.concat([df_response, player1_df, player2_df], axis=1)
+        #df = pd.concat([df_response, player1_df, player2_df], axis=1)
+        df = pd.concat([df_response], axis=1)
         df_list.append(df)
     return pd.concat(df_list, axis=0, ignore_index=True)
 
@@ -42,10 +43,11 @@ def get_match_info(match_id: int):
     if response.status_code != 200:
         return response.json()
     df_response = pd.json_normalize(response.json()['sport_event'])
-    df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
-    player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
-    player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
-    df = pd.concat([df_response, player1_df, player2_df], axis=1)
+    #df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
+    #player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
+    #player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
+    #df = pd.concat([df_response, player1_df, player2_df], axis=1)
+    df = pd.concat([df_response], axis=1)
     data = prep_ranking()
     df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(dict(zip(data['id'], data['rank'])))
     return df
@@ -105,7 +107,7 @@ def prep_player(player_id: int) -> pd.DataFrame:
     data_1 = pd.concat([data, data['sport_event'].apply(pd.Series)], axis=1).drop('sport_event', axis=1)
     data_1 = data_1.rename(columns={'id': 'match_id'})
     # Extraction des json de la colonne 'competitors' en tant que nouvelles colonnes
-    data_1 = pd.concat([data_1, data_1['competitors'].apply(pd.Series)], axis=1).drop('competitors', axis=1)
+    #data_1 = pd.concat([data_1, data_1['competitors'].apply(pd.Series)], axis=1).drop('competitors', axis=1)
     # Extraction des colonnes '0' et '1' contenant les infos joueurs
     data_2 = pd.concat([data_1, data_1.iloc[:, -1].apply(pd.Series)], axis=1)
     data_2 = data_2.rename(columns={'id': 'player1_id'})
@@ -131,4 +133,4 @@ def make_table(n: int = 50):
     return pd.concat([prep_player(player_id=player_id) for player_id in tqdm(get_top(n=n), desc='Processing players')], # type: ignore
                      axis=0)
 
-# %%
+

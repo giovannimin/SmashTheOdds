@@ -4,8 +4,7 @@ Created on 03/07/2023 13:40
 @author: GiovanniMINGHELLI
 """
 import warnings
-#import pylance
-#import sources
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sources.data_pipeline import global_transformer
@@ -41,4 +40,6 @@ def get_pred(match_id: int):
         return get_response(model=model, data=data)
     except TypeError:
         return match_info
+
+
 
