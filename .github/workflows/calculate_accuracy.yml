@@ -1,0 +1,40 @@
+name: Calculate Accuracy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  calculate_accuracy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: pip install scikit-learn numpy
+
+      - name: Run ML model and calculate accuracy
+        run: |
+          python model_testing.py
+        #env:
+          #YOUR_API_KEY: ${{ secrets.YOUR_API_KEY }} # If you need any sensitive data like API keys
+
+      - name: Display accuracy
+        run: |
+          echo "Accuracy: $(cat accuracy.txt)"
+  #affiche l'accuracy du fichier
+  #vérification si accuracy inférieur au seuil, affiche une alerte
+          if (( $(echo "$(cat accuracy.txt) < 0.6" | bc -l) )); then
+               echo "WARNING: Accuracy is too low!"
+          fi
