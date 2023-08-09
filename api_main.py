@@ -16,6 +16,9 @@ from sources.data_pipeline import global_transformer
 from sources.preprocessor import get_match_info
 from sources.utils import get_root, get_last_model, get_response
 import joblib
+import csv
+import os
+from config import USERS
 
 
 warnings.filterwarnings("ignore")
@@ -48,7 +51,6 @@ users = {
         "password" : pwd_context.hash('ravie')
     }
 }
-
 
 class UserCreate(BaseModel):
     #user: Optional[str]= None
@@ -92,7 +94,20 @@ def add_user(user_info: UserCreate):
         "username": user_info.username,
         "password": pwd_context.hash(user_info.password),
     }
+    #vérification s'il n'est pas déjà existant dans le fichier users.csv
+
+    if users.get(user_info.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this username already exists",
+        )
+    #update du dictionnaire
     users[user_info.username] = new_user
+    #ajout d'une ligne dans le fichier users.csv
+    with open(os.path.join(get_root(), 'users.csv'), mode="a", newline="") as csvfile:
+        fieldnames = ["username", "password"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writerow(new_user)
     return {"message": "User added successfully"}
 
 @app.post("/logout")

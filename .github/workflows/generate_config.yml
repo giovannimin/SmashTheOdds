@@ -1,0 +1,34 @@
+name: Generate Config
+
+on:
+  push:
+    paths:
+      - users.csv
+
+jobs:
+  generate_config:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run generate_config.py
+        run: |
+          python generate_config.py users.csv config.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git commit -am "Update config.py"
+          git push
