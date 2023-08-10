@@ -7,8 +7,8 @@ import os
 
 import pandas as pd
 import numpy as np
-from .preprocessor import get_weekly_schedule, prep_ranking
-from .utils import get_root, check_file_modification, replace_player_ids_with_rank, filter_dataframe
+from sources.preprocessor import get_weekly_schedule, prep_ranking
+from sources.utils import get_root, check_file_modification, replace_player_ids_with_rank, filter_dataframe
 
 
 def history(df: pd.DataFrame() = pd.read_csv(os.path.join(get_root(), 'database.nosync', 'updated_table.csv'))):
