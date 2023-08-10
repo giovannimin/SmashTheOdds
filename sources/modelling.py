@@ -9,6 +9,7 @@ from sources.utils import calculate_odds, get_last_model, get_root
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.ensemble import RandomForestClassifier
+import pickle
 import joblib
 from datetime import datetime
 from sklearn.model_selection import GridSearchCV
@@ -53,8 +54,14 @@ class Model():
         # Étape 6 : Enregistrement des résultats et du modèle
         results.to_csv(os.path.join(get_root(), 'predicted_table.csv'), mode='a', header=True, index=False)
         # Ajouter la colonne des sr:match_id
-        joblib.dump(value=best_model, filename=f'model_rf_{datetime.now().strftime("%Y-%m-%d")}.joblib')
+        joblib.dump(value=best_model, filename=f'model_rf_.joblib')
+        # Save the model using protocol 3
+        #with open(f'model_rf_.pkl', 'wb'):
+            #pickle.dump(best_model, f'model_rf_.pkl', protocol=3)
 
+# Load the model
+#       with open('model_filename.pkl', 'rb') as file:
+    #   loaded_model = pickle.load(file)
     def get_accuracy(self):
         return self.accuracy
 

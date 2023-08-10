@@ -5,19 +5,22 @@ Created on 03/07/2023 13:40
 """
 import warnings
 
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException,Body, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse
+from fastapi import Form
 from pydantic import BaseModel
 from sources.data_pipeline import global_transformer
 from sources.preprocessor import get_match_info
 from sources.utils import get_root, get_last_model, get_response
 import joblib
+import pickle
 import csv
 import os
+
 from config import USERS
 
 
@@ -57,27 +60,37 @@ class UserCreate(BaseModel):
     username : str
     password: str
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
-@app.get("/login")
-def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
-    username = credentials.username
-    if not(users.get(username)) or not(pwd_context.verify(credentials.password, users[username]["password"])):
+@app.post("/login")
+async def post_login(login_request: LoginRequest = Body(...)):
+    username = login_request.username
+    if not(users.get(username)):
+        # User is not registered, redirect to user registration endpoint
+        response = RedirectResponse(url="/user")
+        return response
+    elif not(pwd_context.verify(login_request.password, users[username]["password"])):
+        # User is registered but provided incorrect password
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect password",
             headers={"WWW-Authenticate": "Basic"},
         )
-        # If login is successful, redirect the user to another endpoint (e.g., "/user")
-    response= RedirectResponse(url="/predict")
-    return response
+    else:
+        # User is registered and provided correct credentials, redirect to predict endpoint
+        response = RedirectResponse(url="/status")
+        return response
 
 
-'''@app.get("/status")
-def get_status():
-    return {"status": 1}'''
+@app.get("/status")
+async def get_status():
+    response = RedirectResponse(url="/predict")
+    return {"status": 1, "response": response}
 
 @app.get('/predict/')
-def get_pred(match_id: int):
+async def get_pred(match_id: int):
     model = joblib.load(get_last_model())
     match_info = get_match_info(match_id=match_id)
     try:
@@ -88,7 +101,7 @@ def get_pred(match_id: int):
 
 
 @app.post("/user")
-def add_user(user_info: UserCreate):
+async def add_user(user_info: UserCreate):
 
     new_user = {
         "username": user_info.username,
@@ -111,7 +124,7 @@ def add_user(user_info: UserCreate):
     return {"message": "User added successfully"}
 
 @app.post("/logout")
-def logout_user(credentials: HTTPBasicCredentials = Depends(security)):
+async def logout_user(credentials: HTTPBasicCredentials = Depends(security)):
     # Here, you can perform any necessary cleanup or token/session invalidation logic.
     # For a simple logout, you can simply return a message.
     return {"message": "Logout successful"}

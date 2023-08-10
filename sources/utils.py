@@ -50,11 +50,11 @@ def check_file_modification(file_path, since: int = 3):
     return False
 
 
-def replace_player_ids_with_rank(dataframe: pd.DataFrame, ranking=pd.DataFrame, unranked: int = 1000) -> pd.DataFrame:
+def replace_player_ids_with_rank(dataframe: pd.DataFrame, ranking: pd.DataFrame, unranked: int = 1000) -> pd.DataFrame:
     # Création d'un dictionnaire pour mapper les ID des joueurs avec les classements ATP
     player_rank_mapping = dict(zip(ranking['id'], ranking['rank']))
     # Modification des ID des joueurs par les classements ATP associés
-    dataframe[['player1_id', 'player2_id']] = dataframe[['player1_id', 'player2_id']].replace(player_rank_mapping)
+    dataframe[['player1_id', 'player2_id']] = dataframe[['player1_id', 'player2_id']].replace(list(player_rank_mapping))
     # Remplacement des ID des joueurs hors classement ATP par 1000 pour marquer la différence
     dataframe['player1_id'] = dataframe['player1_id'].replace(to_replace='^.*$', value=unranked, regex=True)
     dataframe['player2_id'] = dataframe['player2_id'].replace(to_replace='^.*$', value=unranked, regex=True)
