@@ -6,8 +6,7 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENV API_URL=http://localhost:8000 LOG_PATH=logs/log.txt
+ENV API_URL=http://api:8000 LOG_PATH=logs/log.txt
 
 CMD ["python3", "-m", "pytest", "tests/test_api.py"]
 #CMD ["sh", "-c", "pytest tests/test_api.py > logs/logs_pytest.txt 2>&1"]
-
