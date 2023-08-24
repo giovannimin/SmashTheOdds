@@ -9,9 +9,10 @@ from typing import List
 import pandas as pd
 from tqdm import tqdm
 from datetime import date
-from get_data import Tennis
-from utils import get_number_in_id, check_file_modification, get_root
-from week_calendar import get_next_seven_days
+
+from sources.get_data import Tennis
+from sources.utils import get_number_in_id, check_file_modification, get_root
+from sources.week_calendar import get_next_seven_days
 
 today = date.today()
 
@@ -131,4 +132,4 @@ def make_table(n: int = 50):
     return pd.concat([prep_player(player_id=player_id) for player_id in tqdm(get_top(n=n), desc='Processing players')], # type: ignore
                      axis=0)
 
-# %%
+

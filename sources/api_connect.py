@@ -6,7 +6,8 @@ Created on 23/05/2023 14:30
 import base64
 import time
 import requests
-from utils import get_root
+from sources.utils import get_root
+
 
 
 _ = get_root()
