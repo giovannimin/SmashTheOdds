@@ -7,7 +7,7 @@ import os
 from sources.data_pipeline import global_transformer, next_events, history
 from sources.utils import calculate_odds, get_last_model, get_root
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 import joblib
 from datetime import datetime
@@ -35,6 +35,8 @@ def modelling():
 
     # Étape 3 : Évaluation du meilleur modèle
     print(classification_report(y_test, best_model.predict(X_test)))
+    accuracy = accuracy_score(y_test, best_model.predict(X_test))
+    #print(accuracy)
 
     # Étape 4 : Prédiction et calcul des cotes
     results = val_set.copy()
@@ -48,7 +50,7 @@ def modelling():
     results.to_csv(os.path.join(get_root(), 'predicted_table.csv'), mode='a', header=True, index=False)
     # Ajouter la colonne des sr:match_id
     joblib.dump(value=best_model, filename=f'model_rf_{datetime.now().strftime("%Y-%m-%d")}.joblib')
-
+    return accuracy
 
 if __name__ == '__main__':
     modelling()
