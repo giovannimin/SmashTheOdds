@@ -4,20 +4,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-api
+      args:
+        - REQUIREMENTS=/SmashTheOdds/api/requirements_api.txt
     ports:
       - "8000:8000"
     networks:
       - smash_odds_network
     volumes:
-      - ./database.nosync:/app/data
+      - ./database.nosync:/app/database.nosync
 
   tests:
     build:
       context: .
       dockerfile: Dockerfile-tests_api
+      args:
+        - REQUIREMENTS=/SmashTheOdds/tests/requirements_tests.txt
     environment:
       - API_URL=http://api:8000
-      - LOG_PATH=logs/log.txt
+      - LOG_PATH=/app/logs/logs.txt
+      - LOG_PYTEST=/app/logs/logs_pytest.txt
     depends_on:
       - api
     networks:

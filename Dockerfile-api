@@ -4,7 +4,9 @@ WORKDIR /SmashTheOdds
 
 COPY . .
 
-RUN pip install --no-cache-dir -r api/requirements_api.txt
+ARG REQUIREMENTS
+
+RUN pip install --no-cache-dir -r "$REQUIREMENTS"
 
 EXPOSE 8000
 

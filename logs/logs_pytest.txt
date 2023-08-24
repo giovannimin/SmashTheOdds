@@ -1,0 +1,8 @@
+============================= test session starts ==============================
+platform linux -- Python 3.9.17, pytest-7.3.2, pluggy-1.2.0
+rootdir: /SmashTheOdds
+collected 3 items
+
+tests/test_api.py ...                                                    [100%]
+
+============================== 3 passed in 11.51s ==============================
