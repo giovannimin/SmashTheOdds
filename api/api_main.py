@@ -25,6 +25,11 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def get_root():
+    return {"status": 1}
+
+
 @app.get("/status")
 def get_status():
     return {"status": 1}
@@ -39,4 +44,3 @@ def get_pred(match_id: int):
         return get_response(model=model, data=data)
     except TypeError:
         return match_info
-
