@@ -9,7 +9,6 @@ import requests
 from sources.utils import get_root
 
 
-
 _ = get_root()
 
 with open("token.txt", "r") as file:

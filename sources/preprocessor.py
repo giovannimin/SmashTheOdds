@@ -9,7 +9,6 @@ from typing import List
 import pandas as pd
 from tqdm import tqdm
 from datetime import date
-
 from sources.get_data import Tennis
 from sources.utils import get_number_in_id, check_file_modification, get_root
 from sources.week_calendar import get_next_seven_days
@@ -28,27 +27,37 @@ def get_weekly_schedule():
         response = Tennis().get_daily_schedule(year=year, month=month, day=day)
         if response.status_code != 200:
             return response.json()
-        df_response = pd.json_normalize(response.json()['sport_events'])
-        df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
-        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
-        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
+        response_data = response.json()
+        if 'sport_events' in response_data and response_data['sport_events']:
+            df_response = pd.json_normalize(response_data['sport_events'])
+            df_response = pd.json_normalize(response.json()['sport_events'])
+            df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
+            player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
+            player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
 
-        df = pd.concat([df_response, player1_df, player2_df], axis=1)
-        df_list.append(df)
+            df = pd.concat([df_response, player1_df, player2_df], axis=1)
+            df_list.append(df)
     return pd.concat(df_list, axis=0, ignore_index=True)
-
 
 def get_match_info(match_id: int):
     response = Tennis().get_match_summary(match_id=match_id)
     if response.status_code != 200:
         return response.json()
-    df_response = pd.json_normalize(response.json()['sport_event'])
-    df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
-    player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
-    player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
-    df = pd.concat([df_response, player1_df, player2_df], axis=1)
-    data = prep_ranking()
-    df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(dict(zip(data['id'], data['rank'])))
+    response_data = response.json()
+    if 'sport_events' in response_data and response_data['sport_events']:
+        df_response = pd.json_normalize(response_data['sport_events'])
+        df_response = pd.json_normalize(response.json()['sport_events'])
+        df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
+        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
+        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
+
+        df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
+        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_') # type: ignore
+        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_') # type: ignore
+        df = pd.concat([df_response, player1_df, player2_df], axis=1)
+
+        data = prep_ranking()
+        df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(dict(zip(data['id'], data['rank'])))
     return df
 
 

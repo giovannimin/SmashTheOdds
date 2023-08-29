@@ -20,7 +20,9 @@ import joblib
 import pickle
 import csv
 import os
-
+from flask import Flask
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 from config import USERS
 
 
@@ -41,57 +43,42 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 users = {
 
-    "daniel" :{
+    "daniel": {
         "username": "daniel",
-        "password": pwd_context.hash('datascientest'),
+        "name": "Daniel Datascientest",
+        "hashed_password": pwd_context.hash('datascientest'),
     },
+
     "john" : {
         "username" :  "john",
-        "password" : pwd_context.hash('secret'),
+        "name" : "John Datascientest",
+        "hashed_password" : pwd_context.hash('secret'),
     },
-    "lucie" :{
-        "username": "lucie",
-        "password" : pwd_context.hash('ravie')
+    "lucie" : {
+        "username" : "lucie",
+        "name" : "lucie Datascientest",
+        "hashed_password" : pwd_context.hash('ravie'),
     }
 }
-
 class UserCreate(BaseModel):
     #user: Optional[str]= None
     username : str
     password: str
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
-'''
-@app.post("/login")
-async def post_login(login_request: LoginRequest = Body(...)):
-    username = login_request.username
-    if not(users.get(username)):
-        # User is not registered, redirect to user registration endpoint
-        response = RedirectResponse(url="/user")
-        return response
-    elif not(pwd_context.verify(login_request.password, users[username]["password"])):
-        # User is registered but provided incorrect password
+def get_current_user(status: int = 1, credentials: HTTPBasicCredentials = Depends(security)):
+    username = credentials.username
+    if not(users.get(username)) or not(pwd_context.verify(credentials.password, users[username]['hashed_password'])):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Basic"},
         )
-    else:
-        # User is registered and provided correct credentials, redirect to predict endpoint
-        response = RedirectResponse(url="/status_test")
-        return response
-'''
-@app.get("/")
-def get_root():
-    return {"status": 1}
+    return credentials.username
+@app.get("/user")
+def current_user(username: str = Depends(get_current_user)):
+    return "Hello {}".format(username)
 
-
-@app.get("/status")
-def get_status():
-    return {"status": 1}
+'''    
 
 
 @app.get("/status_test")
@@ -99,7 +86,7 @@ async def get_status():
     #response = RedirectResponse(url="/predict")
     return {"status": 1} #, "response": response}
 
-@app.get('/predict/')
+@app.get('user/predict/')
 async def get_pred(match_id: int):
     model = joblib.load(get_last_model())
     match_info = get_match_info(match_id=match_id)
@@ -108,7 +95,6 @@ async def get_pred(match_id: int):
         return get_response(model=model, data=data)
     except TypeError:
         return match_info
-'''
 
 
 @app.post("/user")
@@ -125,7 +111,7 @@ async def add_user(user_info: UserCreate):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this username already exists",
         )
-    #update du dictionnaire
+#update du dictionnaire
     users[user_info.username] = new_user
     #ajout d'une ligne dans le fichier users.csv
     with open(os.path.join(get_root(), 'users.csv'), mode="a", newline="") as csvfile:
@@ -139,4 +125,8 @@ async def logout_user(credentials: HTTPBasicCredentials = Depends(security)):
     # Here, you can perform any necessary cleanup or token/session invalidation logic.
     # For a simple logout, you can simply return a message.
     return {"message": "Logout successful"}
-'''
+
+
+@app.get("/user")
+def current_user(username: str = Depends(get_current_user)):
+    return "Hello {}".format(username)'''

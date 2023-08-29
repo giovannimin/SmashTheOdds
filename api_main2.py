@@ -20,7 +20,9 @@ import joblib
 import pickle
 import csv
 import os
-
+from flask import Flask
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 from config import USERS
 
 
@@ -28,33 +30,62 @@ warnings.filterwarnings("ignore")
 
 project_path = get_root()
 
-app = FastAPI()
+app = Flask(import_name='smashtheodds')
 
-app.add_middleware(
+'''app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
-)
-security = HTTPBasic()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+)'''
+auth = HTTPBasicAuth()
+#pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 users = {
 
     "daniel" :{
-        "username": "daniel",
-        "password": pwd_context.hash('datascientest'),
+        "password": generate_password_hash('datascientest'),
+        'private' : 'Private Resource daniel',
+        "role": 'user'
     },
     "john" : {
-        "username" :  "john",
-        "password" : pwd_context.hash('secret'),
+        "password" : generate_password_hash('secret'),
+        'private' : 'Private Resource john',
+        "role": 'user'
     },
     "lucie" :{
-        "username": "lucie",
-        "password" : pwd_context.hash('ravie')
+        "password" : generate_password_hash('ravie'),
+        'private' : 'Private Resource lucie',
+        "role": ['admin','user']
     }
 }
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and check_password_hash(users.get(username)['password'], password):
+        return username
 
+@auth.get_user_roles
+def get_user_roles(user):
+    return users.get(user)['role']
+
+@app.route('/admin')
+@auth.login_required(role='admin')
+def admin():
+    return "Hello {}, vous êtes admin!".format(auth.current_user())
+
+@app.route('/')
+@auth.login_required(role='user')
+def index():
+    return "Hello, {}!".format(auth.current_user())
+
+@app.route('/private')
+@auth.login_required(role='user')
+def private():
+    return "Resource : {}".format(users[auth.current_user()]['private'])
+
+if __name__ == '__main__':
+    app.run()
+'''
 class UserCreate(BaseModel):
     #user: Optional[str]= None
     username : str
@@ -64,8 +95,7 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-'''
-@app.post("/login")
+@app.get("/")
 async def post_login(login_request: LoginRequest = Body(...)):
     username = login_request.username
     if not(users.get(username)):
@@ -81,23 +111,14 @@ async def post_login(login_request: LoginRequest = Body(...)):
         )
     else:
         # User is registered and provided correct credentials, redirect to predict endpoint
-        response = RedirectResponse(url="/status_test")
+        response = RedirectResponse(url="/status")
         return response
-'''
-@app.get("/")
-def get_root():
-    return {"status": 1}
 
 
 @app.get("/status")
-def get_status():
-    return {"status": 1}
-
-
-@app.get("/status_test")
 async def get_status():
-    #response = RedirectResponse(url="/predict")
-    return {"status": 1} #, "response": response}
+    response = RedirectResponse(url="/predict")
+    return {"status": 1, "response": response}
 
 @app.get('/predict/')
 async def get_pred(match_id: int):
@@ -108,7 +129,6 @@ async def get_pred(match_id: int):
         return get_response(model=model, data=data)
     except TypeError:
         return match_info
-'''
 
 
 @app.post("/user")
@@ -138,5 +158,4 @@ async def add_user(user_info: UserCreate):
 async def logout_user(credentials: HTTPBasicCredentials = Depends(security)):
     # Here, you can perform any necessary cleanup or token/session invalidation logic.
     # For a simple logout, you can simply return a message.
-    return {"message": "Logout successful"}
-'''
+    return {"message": "Logout successful"}'''
