@@ -64,6 +64,7 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+'''
 @app.post("/login")
 async def post_login(login_request: LoginRequest = Body(...)):
     username = login_request.username
@@ -82,6 +83,15 @@ async def post_login(login_request: LoginRequest = Body(...)):
         # User is registered and provided correct credentials, redirect to predict endpoint
         response = RedirectResponse(url="/status_test")
         return response
+'''
+@app.get("/")
+def get_root():
+    return {"status": 1}
+
+
+@app.get("/status")
+def get_status():
+    return {"status": 1}
 
 
 @app.get("/status_test")
@@ -98,6 +108,7 @@ async def get_pred(match_id: int):
         return get_response(model=model, data=data)
     except TypeError:
         return match_info
+'''
 
 
 @app.post("/user")
@@ -128,3 +139,4 @@ async def logout_user(credentials: HTTPBasicCredentials = Depends(security)):
     # Here, you can perform any necessary cleanup or token/session invalidation logic.
     # For a simple logout, you can simply return a message.
     return {"message": "Logout successful"}
+'''

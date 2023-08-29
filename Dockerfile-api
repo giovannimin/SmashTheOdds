@@ -4,7 +4,10 @@ WORKDIR /SmashTheOdds
 
 COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt
+ARG REQUIREMENTS
 
-CMD ["python3", "-m", "uvicorn", "api.api_main:app", "--reload"]
+RUN pip install --no-cache-dir -r "$REQUIREMENTS"
 
+EXPOSE 8000
+
+CMD ["python3", "-m", "uvicorn", "api.api_main:app", "--reload", "--host", "0.0.0.0"]

@@ -1,0 +1,32 @@
+---
+- name: Execution des services de test API
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Récupérer la dernière version de la branche principale
+      git:
+        repo: https://github.com/giovannimin/SmashTheOdds
+        dest: ./SmashTheOdds
+        version: main
+      register: git_pull
+
+    - name: Lancer les services api et tests si une modification de la branche principale est détéctée
+      command: "docker-compose -f ./SmashTheOdds/docker-compose.yml up -d api tests"
+      async: 600
+      poll: 0
+      ignore_errors: yes
+      when: git_pull.changed | bool
+      register: async_status
+
+    - name: Attendre que la tâche précédente soit terminée
+      async_status:
+        jid: "{{ async_status.ansible_job_id }}"
+      register: async_result
+      until: async_result.finished
+      retries: 60
+      delay: 10
+      when: git_pull.changed | bool
+
+    - name: Arrêt des services si le conteneur de tests est terminé
+      command: "docker stop $(docker ps -q)"
+      when: async_result.finished and git_pull.changed | bool

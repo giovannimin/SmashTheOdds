@@ -16,7 +16,7 @@ if not api_url:
 
 log_path = os.getenv("LOG_PATH")
 if not log_path:
-    log_path = './logs/logs.txt'
+    log_path = 'SmashTheOdds/logs/logs.txt'
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,28 @@
+---
+- name: Exécuter les DAGs et les services Airflow le dimanche soir
+  hosts: localhost
+  tasks:
+    - name: Vérifier si aujourd'hui est dimanche
+      command: date +%u
+      register: today
+      changed_when: false
+
+    - name: Lancer les services Airflow si aujourd'hui est dimanche
+      command: "docker-compose -f ./SmashTheOdds/docker-compose.yml up -d airflow-init postgres redis airflow-scheduler airflow-triggerer flower airflow-cli airflow-worker"
+      when: today.stdout == "7"
+      async: 3600
+      poll: 0
+
+    - name: Attendre une heure
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 3600
+      delay: 10
+
+    - name: Arrêter les services Airflow après une heure
+      command: "docker-compose -f ./SmashTheOdds/docker-compose.yml down"
+      when: today.stdout == "7"
+      async: 0
+      poll: 0
