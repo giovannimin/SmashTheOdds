@@ -1,5 +1,8 @@
 # SmashTheOdds
 It is a machine learning project that predicts tennis match scores. By analyzing player rankings, historical performance, and other key factors, it provides insights into the possible outcomes of tennis matches. The goal is to help users make more informed decisions when betting on tennis matches.
+The project is based on getting tennis matches infos from SportRadar-TennisAPI and use them to predict the results of the next week matches.
+The prediction is based on a RandomForest classifier with the best hyperparameters (but can be adjusted if you want to increase the performance of the model).
+In order to keep the dataset up to date, data are extracted every sunday from the API and model is also trained again to reflect matches results. 
 
 GAME SET & BET 🎾
 
@@ -20,9 +23,9 @@ To run the SmashTheOdds project locally, you must :
 Here are the steps you need to follow to have an operational development and test environment:
 
 ```
-A définir
+docker-compose up --build
 ```
-
+this is the only command needed to get started with FastAPI in frontend
 
 
 ## Running tests
@@ -32,9 +35,9 @@ python3 -m pytest tests/                                                        
 ```
 
 
-## Deployment
+## Playing and Bet
 
-Here are the steps to follow to deploy :
+
 
 ```
 A définir
@@ -42,8 +45,9 @@ A définir
 
 ## Technologies :
 
-* 
-* 
+* fastAPI as interface to visualize result
+* Docker for containerization
+* Airflow for orchestration
 
 ## Contribution
 
