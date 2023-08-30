@@ -6,7 +6,7 @@ Created on 03/07/2023 13:40
 import warnings
 
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Depends, FastAPI, HTTPException,Body, status
+from fastapi import Depends, FastAPI, HTTPException, Body, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse
@@ -22,7 +22,6 @@ import csv
 import os
 
 from config import USERS
-
 
 warnings.filterwarnings("ignore")
 
@@ -41,28 +40,31 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 users = {
 
-    "daniel" :{
+    "daniel": {
         "username": "daniel",
         "password": pwd_context.hash('datascientest'),
     },
-    "john" : {
-        "username" :  "john",
-        "password" : pwd_context.hash('secret'),
+    "john": {
+        "username": "john",
+        "password": pwd_context.hash('secret'),
     },
-    "lucie" :{
+    "lucie": {
         "username": "lucie",
-        "password" : pwd_context.hash('ravie')
+        "password": pwd_context.hash('ravie')
     }
 }
 
+
 class UserCreate(BaseModel):
-    #user: Optional[str]= None
-    username : str
+    # user: Optional[str]= None
+    username: str
     password: str
+
 
 class LoginRequest(BaseModel):
     username: str
     password: str
+
 
 '''
 @app.post("/login")
@@ -84,6 +86,8 @@ async def post_login(login_request: LoginRequest = Body(...)):
         response = RedirectResponse(url="/status_test")
         return response
 '''
+
+
 @app.get("/")
 def get_root():
     return {"status": 1}
@@ -96,8 +100,9 @@ def get_status():
 
 @app.get("/status_test")
 async def get_status():
-    #response = RedirectResponse(url="/predict")
-    return {"status": 1} #, "response": response}
+    # response = RedirectResponse(url="/predict")
+    return {"status": 1}  # , "response": response}
+
 
 @app.get('/predict/')
 async def get_pred(match_id: int):
@@ -108,6 +113,8 @@ async def get_pred(match_id: int):
         return get_response(model=model, data=data)
     except TypeError:
         return match_info
+
+
 '''
 
 

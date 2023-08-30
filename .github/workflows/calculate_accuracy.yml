@@ -4,34 +4,24 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  calculate_accuracy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout latest code version from git
         uses: actions/checkout@v2
         with:
           path: ./
 
-      - name: Set up Python
+      - name: Set up Python environement
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
 
-      - name: Install dependencies
-        run: pip install scikit-learn numpy
+      - name: Install dependencies from requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Run ML model and display accuracy
-        run: |
-          python model_testing.py
-
-          echo "Accuracy: $(cat accuracy.txt)" # Display accuracy from the file
-          # Check if accuracy is too low
-          if (( $(echo "$(cat accuracy.txt) < 0.6" | bc -l) )); then
-            echo "WARNING: Accuracy is too low!" # Display a warning message in the logs
-          fi
+      - name: Run test accuracy
+        run: python3 tests/model_testing.py
