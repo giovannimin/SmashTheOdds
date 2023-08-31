@@ -45,11 +45,12 @@ class Model:
 
         # Étape 4 : Prédiction et calcul des cotes
         results = val_set.copy()
+        output = results[['player1_rank', 'player2_rank', 'atp_difference']]
         probas = best_model.predict_proba(results)
         odds = np.vectorize(calculate_odds)(probas)
 
-        results['classe'], results['proba'] = best_model.predict(results), probas.round(2).tolist()
-        results['odds'] = odds.round(2).tolist()
+        output['classe'], output['proba'] = best_model.predict(results), probas.round(2).tolist()
+        output['odds'] = odds.round(2).tolist()
 
         # Étape 5 : Suppresion de l'ancien modèle
         last_model = get_last_model()
@@ -58,11 +59,12 @@ class Model:
 
 
         # Étape 6 : Enregistrement des résultats et du modèle
-        results.to_csv(os.path.join(get_root(), 'database.nosync', 'predicted_table.csv'),
+        output.to_csv(os.path.join(get_root(), 'database.nosync', 'predicted_table.csv'),
                        mode='a', header=False, index=False)
 
         # Ajouter la colonne des sr:match_id
-        joblib.dump(value=best_model, filename=f'model_rf_.joblib')
+        model_path = os.path.join(get_root(), 'ml_models', f'model_rf_.joblib')
+        joblib.dump(value=best_model, filename=model_path)
         # Save the model using protocol 3
         # with open(f'model_rf_.pkl', 'wb'):
         # pickle.dump(best_model, f'model_rf_.pkl', protocol=3)

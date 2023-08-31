@@ -95,10 +95,11 @@ def get_last_model():
     Renvoi le chemin du dernier modèle modifié à la racine du projet
     :return: (str): chemin absolu du dernier modèle
     """
-    last_model = [file for file in os.listdir(get_root()) if file.startswith('model_')]
+    model_dir = os.path.join(get_root(), 'ml_models')
+    last_model = [file for file in os.listdir(model_dir) if file.startswith('model_')]
     if last_model:
-        model_list = sorted(last_model, key=lambda x: os.path.getmtime(os.path.join(get_root(), x)), reverse=True)
-        return os.path.join(get_root(), model_list[0])
+        model_list = sorted(last_model, key=lambda x: os.path.getmtime(os.path.join(model_dir, x)), reverse=True)
+        return os.path.join(model_dir, model_list[0])
     return None
 
 
