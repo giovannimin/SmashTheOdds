@@ -24,4 +24,4 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run test accuracy
-        run: python3 tests/model_testing.py
+        run: python3 -m sources.ml.model_testing
