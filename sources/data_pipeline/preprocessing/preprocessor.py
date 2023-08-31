@@ -51,15 +51,11 @@ def get_match_info(match_id: int):
         df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
         player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')  # type: ignore
         player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_')  # type: ignore
-
-        df_response[['player1', 'player2']] = df_response['competitors'].apply(pd.Series)
-        player1_df = pd.json_normalize(df_response['player1']).add_prefix('player1_')  # type: ignore
-        player2_df = pd.json_normalize(df_response['player2']).add_prefix('player2_')  # type: ignore
         df = pd.concat([df_response, player1_df, player2_df], axis=1)
 
         data = prep_ranking()
         df[['player1_id', 'player2_id']] = df[['player1_id', 'player2_id']].replace(dict(zip(data['id'], data['rank'])))
-    return df
+        return df
 
 
 def get_match_proba(match_id: int) -> tuple:

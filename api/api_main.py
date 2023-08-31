@@ -8,20 +8,20 @@ import warnings
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Depends, FastAPI, HTTPException, Body, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from passlib.context import CryptContext
+# from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse
 from fastapi.responses import JSONResponse
 from fastapi import Form
 from pydantic import BaseModel
-from sources.data_pipeline import global_transformer
-from sources.preprocessor import get_match_info
-from sources.utils import get_root, get_last_model, get_response
+from sources.data_pipeline.data_pipeline import *
+from sources.data_pipeline.preprocessing.preprocessor import *
+from sources.utils.utils import *
 import joblib
 import pickle
 import csv
 import os
 
-from config import USERS
+# from config import USERS
 
 warnings.filterwarnings("ignore")
 
@@ -35,35 +35,35 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
-security = HTTPBasic()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-users = {
-
-    "daniel": {
-        "username": "daniel",
-        "password": pwd_context.hash('datascientest'),
-    },
-    "john": {
-        "username": "john",
-        "password": pwd_context.hash('secret'),
-    },
-    "lucie": {
-        "username": "lucie",
-        "password": pwd_context.hash('ravie')
-    }
-}
-
-
-class UserCreate(BaseModel):
-    # user: Optional[str]= None
-    username: str
-    password: str
-
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
+# security = HTTPBasic()
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+#
+# users = {
+#
+#     "daniel": {
+#         "username": "daniel",
+#         "password": pwd_context.hash('datascientest'),
+#     },
+#     "john": {
+#         "username": "john",
+#         "password": pwd_context.hash('secret'),
+#     },
+#     "lucie": {
+#         "username": "lucie",
+#         "password": pwd_context.hash('ravie')
+#     }
+# }
+#
+#
+# class UserCreate(BaseModel):
+#     # user: Optional[str]= None
+#     username: str
+#     password: str
+#
+#
+# class LoginRequest(BaseModel):
+#     username: str
+#     password: str
 
 
 '''
