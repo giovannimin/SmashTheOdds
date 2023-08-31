@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on 25/08/2023 16:15
-@author: GiovanniMINGHELLI
+Created on 29/08/2023 17:19
+@author: Lu6D
 """
+
 
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
@@ -19,8 +20,8 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id='Fetch data',
-    description='Recuperer les données de matchsw',
+    dag_id='Check metrics',
+    description='Verifies les métriques du nouveau modèle',
     tags=['SmashTheOdds'],
     default_args=default_args,
     schedule_interval=timedelta(minutes=1),
@@ -28,11 +29,11 @@ dag = DAG(
 )
 
 with dag:
-    fetch_data_task = BashOperator(
-        task_id='fetch_week_data',
-        bash_command='python3 /opt/airflow/sources/update_table.py',
+    check_metrics_task = BashOperator(
+        task_id='check metrics',
+        bash_command='python3 /opt/airflow/sources/model_testing.py',
         retries=1
     )
 
 
-    fetch_data_task
+    check_metrics_task
