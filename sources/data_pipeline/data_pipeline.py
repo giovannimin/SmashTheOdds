@@ -3,12 +3,12 @@
 Created on 03/07/2023 15:06
 @author: GiovanniMINGHELLI
 """
-import os
-
-import pandas as pd
 import numpy as np
-from sources.preprocessor import get_weekly_schedule, prep_ranking
-from sources.utils import get_root, check_file_modification, replace_player_ids_with_rank, filter_dataframe
+import os
+import pandas as pd
+
+from sources.data_pipeline.preprocessing.preprocessor import get_weekly_schedule, prep_ranking
+from sources.utils.utils import *
 
 
 def history(df: pd.DataFrame() = pd.read_csv(os.path.join(get_root(), 'database.nosync', 'updated_table.csv'))):
@@ -17,8 +17,6 @@ def history(df: pd.DataFrame() = pd.read_csv(os.path.join(get_root(), 'database.
     :param df: (pd.DataFrame) DataFrame contenant les données des matchs.
     :return: (pd.DataFrame) DataFrame traité contenant les colonnes 'winner_is', 'player1_id' et 'player2_id'.
     """
-    # Modification des ID joueurs par le classement ATP associé
-    df = replace_player_ids_with_rank(dataframe=df, ranking=prep_ranking(), unranked=1000)
 
     # Création de la variable cible, 0 si le joueur 1 gagne et 1 si le joueur 2 gagne
     df['winner_is'] = np.where(df['player1_id'] == df['winner_id'], 0, 1)
@@ -52,8 +50,6 @@ def next_events(df: str = os.path.join(get_root(), 'database.nosync', 'planning_
     else:
         planning = get_weekly_schedule()
 
-    # Modification des ID joueurs par le classement ATP associé
-    planning = replace_player_ids_with_rank(dataframe=planning, ranking=prep_ranking(), unranked=1000)
 
     # Sélection uniquement des match ATP n'ayant pas encore commencés
     planning = filter_dataframe(dataframe=planning, filters={
@@ -65,11 +61,23 @@ def next_events(df: str = os.path.join(get_root(), 'database.nosync', 'planning_
 
 
 def global_transformer(df: pd.DataFrame):
-    # Modification des ID joueurs par le classement ATP associé
-    df = replace_player_ids_with_rank(dataframe=df, ranking=prep_ranking(), unranked=1000)
+    ranking_ATP=prep_ranking()
+    # Ajout des rangs ATP
+    df = pd.concat([df, replace_player_ids_with_rank(dataframe=df, ranking=ranking_ATP, unranked=1000)])
+    df = pd.concat([df, speed_feature_engineering(dataframe=df, ranking=ranking_ATP)])
     # Création de la variable rank_diff
-    df.loc[:, 'atp_difference'] = df['player2_id'] - df['player1_id']
+    df.loc[:, 'atp_difference'] = df['player2_rank'] - df['player1_rank']
     # Gestion des affrontement hors ATP
+    df = df[~((df['player2_rank'] == 1000) & (df['player1_rank'] == 1000))]
+
+    # Suppression des colonnes id
+    df.drop(columns=['player1_id', 'player2_id'], axis=1, inplace=True)
+
+    # Supression des colonnes non-numériques
+    def is_numeric(row):
+        return row.apply(pd.to_numeric, errors='coerce').notna().all()
+    df = df[df.apply(is_numeric, axis=1)]
+
     return df
 
 

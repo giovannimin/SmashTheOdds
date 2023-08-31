@@ -4,11 +4,10 @@ Created on 25/05/2023 17:09
 @author: GiovanniMINGHELLI
 """
 
-import re
 import os
-from datetime import datetime, timedelta
 import pandas as pd
-
+import re
+from datetime import datetime, timedelta
 
 
 def get_root(root: str = "SmashTheOdds"):
@@ -54,12 +53,25 @@ def replace_player_ids_with_rank(dataframe: pd.DataFrame, ranking: pd.DataFrame,
     # Création d'un dictionnaire pour mapper les ID des joueurs avec les classements ATP
     player_rank_mapping = dict(zip(ranking['id'], ranking['rank']))
     # Modification des ID des joueurs par les classements ATP associés
-    dataframe[['player1_id', 'player2_id']] = dataframe[['player1_id', 'player2_id']].replace(list(player_rank_mapping))
+    dataframe[['player1_rank', 'player2_rank']] = dataframe[['player1_id', 'player2_id']].replace(player_rank_mapping)
     # Remplacement des ID des joueurs hors classement ATP par 1000 pour marquer la différence
-    dataframe['player1_id'] = dataframe['player1_id'].replace(to_replace='^.*$', value=unranked, regex=True)
-    dataframe['player2_id'] = dataframe['player2_id'].replace(to_replace='^.*$', value=unranked, regex=True)
+    dataframe['player1_rank'] = dataframe['player1_rank'].replace(to_replace='^.*$', value=unranked, regex=True)
+    dataframe['player2_rank'] = dataframe['player2_rank'].replace(to_replace='^.*$', value=unranked, regex=True)
     return dataframe
 
+def speed_feature_engineering(dataframe: pd.DataFrame, ranking: pd.DataFrame) -> pd.DataFrame:
+
+    player_movement = dict(zip(ranking['id'], ranking['ranking_movement']))
+    player_form = dict(zip(ranking['id'], ranking['ranking_movement'].apply(lambda x: -1 if x < 0 else 1 if x > 0 else 0)))
+    player_atp_points = dict(zip(ranking['id'], ranking['points']))
+    player_tournaments_played = dict(zip(ranking['id'], ranking['tournaments_played']))
+
+    dataframe[['player1_ranking_movement', 'player2_ranking_movement']] = dataframe[['player1_id', 'player2_id']].replace(player_movement)
+    dataframe[['player1_form', 'player2_form']] = dataframe[['player1_id', 'player2_id']].replace(player_form)
+    dataframe[['player1_atp_points', 'player2_atp_points']] = dataframe[['player1_id', 'player2_id']].replace(player_atp_points)
+    dataframe[['player1_tournaments_played', 'player2_tournaments_played']] = dataframe[['player1_id', 'player2_id']].replace(player_tournaments_played)
+
+    return dataframe
 
 def filter_dataframe(dataframe: pd.DataFrame, filters: dict):
     for column, values in filters.items():
@@ -83,9 +95,11 @@ def get_last_model():
     Renvoi le chemin du dernier modèle modifié à la racine du projet
     :return: (str): chemin absolu du dernier modèle
     """
-    last_model = sorted([file for file in os.listdir(get_root()) if file.startswith('model_')],
-                        key=lambda x: os.path.getmtime(os.path.join(get_root(), x)), reverse=True)[0]
-    return os.path.join(get_root(), last_model)
+    last_model = [file for file in os.listdir(get_root()) if file.startswith('model_')]
+    if last_model:
+        model_list = sorted(last_model, key=lambda x: os.path.getmtime(os.path.join(get_root(), x)), reverse=True)
+        return os.path.join(get_root(), model_list[0])
+    return None
 
 
 def get_response(model, data):
@@ -93,4 +107,3 @@ def get_response(model, data):
                'proba': model.predict_proba(data).round(2).flatten().tolist(),
                'odds': (calculate_odds(model.predict_proba(data))).round(2).flatten().tolist()}
     return results
-

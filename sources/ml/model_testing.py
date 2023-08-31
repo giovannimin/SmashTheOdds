@@ -1,10 +1,11 @@
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
-from sources.data_pipeline import global_transformer, next_events, history
-from sources.modelling import Model
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+from sklearn.model_selection import train_test_split
+
+from .modelling.modelling import Model
+from ..data_pipeline.data_pipeline import global_transformer, next_events, history
 
 #récupération du modèle de ML de modelling.py
 mon_model= Model()

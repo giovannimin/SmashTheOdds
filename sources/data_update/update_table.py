@@ -4,9 +4,10 @@ Created on 25/05/2023 20:32
 @author: GiovanniMINGHELLI
 """
 
-from sources.preprocessor import make_table
-from sources.utils import get_root
 import os
+
+from ..data_pipeline.preprocessing.preprocessor import make_table
+from ..utils.utils import get_root
 
 if __name__ == '__main__':
     project_path = get_root()

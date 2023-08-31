@@ -3,19 +3,20 @@
 Created on 05/07/2023 16:43
 @author: GiovanniMINGHELLI, Lu6D
 """
-import os
-from sources.data_pipeline import global_transformer, next_events, history
-from sources.utils import calculate_odds, get_last_model, get_root
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score
-from sklearn.ensemble import RandomForestClassifier
-import pickle
 import joblib
+import numpy as np
+import os
+import pickle
 from datetime import datetime
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
+from sources.data_pipeline.data_pipeline import global_transformer, next_events, history
+from sources.utils.utils import calculate_odds, get_last_model, get_root
 
 
-class Model():
+class Model:
     def __init__(self):
         self.accuracy = None
 
@@ -44,23 +45,30 @@ class Model():
 
         # Étape 4 : Prédiction et calcul des cotes
         results = val_set.copy()
-        results['classe'], results['proba'] = best_model.predict(results), best_model.predict_proba(results)[:,
-                                                                           1].round(2)
-        results['odds'] = calculate_odds(results['proba']).round(2)
+        probas = best_model.predict_proba(results)
+        odds = np.vectorize(calculate_odds)(probas)
+
+        results['classe'], results['proba'] = best_model.predict(results), probas.round(2).tolist()
+        results['odds'] = odds.round(2).tolist()
 
         # Étape 5 : Suppresion de l'ancien modèle
-        os.remove(get_last_model())
+        last_model = get_last_model()
+        if last_model is not None:
+            os.remove(last_model)
+
 
         # Étape 6 : Enregistrement des résultats et du modèle
-        results.to_csv(os.path.join(get_root(), 'predicted_table.csv'), mode='a', header=True, index=False)
+        results.to_csv(os.path.join(get_root(), 'database.nosync', 'predicted_table.csv'),
+                       mode='a', header=False, index=False)
+
         # Ajouter la colonne des sr:match_id
         joblib.dump(value=best_model, filename=f'model_rf_.joblib')
         # Save the model using protocol 3
-        #with open(f'model_rf_.pkl', 'wb'):
-            #pickle.dump(best_model, f'model_rf_.pkl', protocol=3)
+        # with open(f'model_rf_.pkl', 'wb'):
+        # pickle.dump(best_model, f'model_rf_.pkl', protocol=3)
 
-# Load the model
-#       with open('model_filename.pkl', 'rb') as file:
+    # Load the model
+    #       with open('model_filename.pkl', 'rb') as file:
     #   loaded_model = pickle.load(file)
     def get_accuracy(self):
         return self.accuracy

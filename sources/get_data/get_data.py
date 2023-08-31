@@ -6,7 +6,7 @@ Created on 23/05/2023 18:31
 
 
 
-from sources.api_connect import API, token
+from .api_connect.api_connect import API, token
 
 
 class Tennis(API):
