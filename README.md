@@ -10,22 +10,14 @@ GAME SET & BET 🎾
 ## Getting Started
 
 These instructions allow you to run a copy of the project locally on your system for development and testing purposes. Refer to the "Deployment" section for the steps to follow to deploy the project in production.
-### Prerequisites
+### Prerequisites and installation
 
-To run the SmashTheOdds project locally, you must :
+To run the SmashTheOdds project, you must :
 
 1. Clone the repository `git clone https://github.com/giovannimin/SmashTheOdds.git`
 2. Install python libraries needed  `pip install requirements.txt`
 3. Create token.txt file on root and paste token from [SportRadar-TennisAPI](https://developer.sportradar.com)
-
-### Installation
-
-Here are the steps you need to follow to have an operational development and test environment:
-
-```
-docker-compose up --build
-```
-this is the only command needed to get started with FastAPI in frontend
+4. install Ansible and Docker tool to run the entire project (otherwise you can also run the API locally with command in prompt
 
 
 ## Running tests
@@ -38,16 +30,15 @@ python3 -m pytest tests/                                                        
 ## Playing and Bet
 
 
-
-```
-A définir
-```
+As soon as everything is correctly installed you can knwo open the API and play with the tool by entering a match_id found in the planning_table.csv and then the API will return the class if player 1 is winner (class 0 is lost, class 1 if won), then you can get the probability to entere in the class and then the odds
+let's play!
 
 ## Technologies :
 
 * fastAPI as interface to visualize result
 * Docker for containerization
-* Airflow for orchestration
+* Apache-Airflow for orchestration
+* gitActions for test
 
 ## Contribution
 
@@ -55,6 +46,6 @@ Please feel free to submit issues and feature requests!
 
 ## Credits
 
-* **[Duhin Lucie](https://linkedin.com)**
-* **[Minghelli Giovanni](https://linkedin.com)**
+* **[Duhin Lucie](www.linkedin.com/in/lucie-duhin-0b6252a1)**
+* **[Minghelli Giovanni](linkedin.com/in/giovanni-m-069320290)**
 
